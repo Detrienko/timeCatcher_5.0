@@ -214,7 +214,7 @@ const reducer = (state=initialState, action) => {
 			let currentMiniStopwatchTime = newBusiness9[index9].currentMiniStopwatchTime;
 			let currentCountdownTime = newBusiness9[index9].currentCountdownTime;;
 
-			if(newBusiness9[index9].timerOn && newBusiness9[index9].timerTime>59000){
+			if(newBusiness9[index9].timerOn && newBusiness9[index9].timerTime>59999){
 				alert('Would you like to stop timer and add your hours?')
 			}
 			if(newBusiness9[index9].timerOn && newBusiness9[index9].timerTime<60000){
