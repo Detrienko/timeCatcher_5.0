@@ -81,6 +81,9 @@ class BusinessForm extends Component {
         seconds: '00'
       },
       timerTime: 0,
+      timerStart: 0,
+      timerOn: false,
+      timerId: null,
       timerTimeCountDown: 0,
       currentMiniStopwatchTime: {
         hours: '00',
@@ -90,7 +93,6 @@ class BusinessForm extends Component {
       miniTimerTime: 0
     }
     this.props.addBusiness(data);
-    console.log(data);
     this.setState({title: '', goalHours: ''});
     this.closeForm();
 }

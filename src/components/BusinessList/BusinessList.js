@@ -32,6 +32,7 @@ class BusinessList extends Component {
     businessForm = <BusinessForm hideBusinessForm = {this.hideBusinessForm} addBusiness={this.props.addBusiness}/>;
   }   
 
+
   let businessTab = this.props.business.map(
     (el)=><BusinessTab 
             deleteBusiness = {this.props.deleteBusiness}

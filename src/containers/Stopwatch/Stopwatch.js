@@ -7,71 +7,61 @@ import * as actions from '../../store/actions/businessBuilder';
 
 class Stopwatch extends Component {
 
-  state = {
-  	timerOn: false,
-  	timeStart: 0,
-  	timerTime: 0
-  }
-
   startTimer = () => {
 
   if(this.props.businessData.timerTime == 0){
-    this.setState({
+
+    this.props.updateStopwatch({
       timerOn: true,
-      timerTime: 0,
+      // timerTime: 0,
       timerStart: Date.now() - this.props.businessData.timerTime
-    })    
+    }, this.props.businessData.id)
   }
   else{
-    this.setState({
+
+    this.props.updateStopwatch({
       timerOn: true,
       timerTime: this.props.businessData.timerTime,
       timerStart: Date.now() - this.props.businessData.timerTime
-    })
+    }, this.props.businessData.id)
+
   }
 
-  this.timer = setInterval(()=> {
+  this.props.saveTimerId(setInterval(()=> {
 
-  let {timerTime} = this.state;
+    this.props.updateStopwatch({
+      timerTime: Date.now() - this.props.businessData.timerStart,
+    }, this.props.businessData.id)
 
-  let centiseconds = ("0" + (Math.floor(timerTime / 10)% 100)).slice(-2);
-  let seconds = ("0" + (Math.floor(timerTime / 1000) % 60)).slice(-2);
-  let minutes = ("0" + (Math.floor(timerTime / 60000) % 60)).slice(-2);
-  let hours = ("0" + Math.floor(timerTime / 3600000)).slice(-2);
-
-    this.props.saveCurrentStopwatchTime(
-      {hours, minutes, seconds, centiseconds}, this.props.businessData.id, this.state.timerTime
-      );
-
-  	this.setState({
-  		timerTime: Date.now() - this.state.timerStart,
-  	})
-  }, 10)
+  }, 10), this.props.businessData.id
+  )
 
   }
 
   stopTimer = () => {
-  	this.setState({
-  		timerOn: false,
-  	})
-  	clearInterval(this.timer);
+
+   clearInterval(this.props.businessData.timerId);
+
+    this.props.updateStopwatch({
+      timerOn: false,
+    }, this.props.businessData.id)
   }
 
   resetTimer = () => {
-    if(this.state.timerOn === false){
-    	this.setState({
-    		timerStart: 0,
-    		timerTime: 0
-    	})
-      this.props.clearCurrentStopwatchTime(this.props.businessData.id);
+    if(this.props.businessData.timerOn === false){
+       this.props.clearStopwatch(this.props.businessData.id);
+    }
+    else {
+      alert('Stop timer');
     }
   }
 
 
   render() {
 
+
   let index = this.props.business.findIndex((el)=>el.id==this.props.businessData.id);  
-  
+
   let centiseconds = this.props.business[index].currentStopwatchTime.centiseconds;
 	let seconds = this.props.business[index].currentStopwatchTime.seconds;
 	let minutes = this.props.business[index].currentStopwatchTime.minutes;
@@ -83,10 +73,10 @@ class Stopwatch extends Component {
         <div className={classes.stopwatchHeader}>Stopwatch</div>
         <p className={classes.stopwatchTime}>{hours} : {minutes} : {seconds} : {centiseconds}</p>
 
-        {this.state.timerOn === false && (
+        {this.props.business[index].timerOn === false && (
           <Button clicked={this.startTimer}>Start</Button>
           )}
-        {this.state.timerOn === true && (
+        {this.props.business[index].timerOn === true && (
           <Button clicked={this.stopTimer}>Stop</Button>
           )}
         <Button clicked={this.resetTimer}>Reset</Button>
@@ -111,7 +101,9 @@ class Stopwatch extends Component {
   const mapDispatchToProps = dispatch => {
     return{
       saveCurrentStopwatchTime: (time, id, timerTime) => dispatch(actions.saveCurrentStopwatchTime(time, id, timerTime)),
-      clearCurrentStopwatchTime: (id) => dispatch(actions.clearCurrentStopwatchTime(id))
+      clearStopwatch: (id) => dispatch(actions.clearStopwatch(id)),
+      updateStopwatch: (obj, id) => dispatch(actions.updateStopwatch(obj, id)),
+      saveTimerId: (timerId, id) => dispatch(actions.saveTimerId(timerId, id))
     }
   }
 

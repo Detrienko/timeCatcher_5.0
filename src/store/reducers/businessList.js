@@ -37,7 +37,10 @@ const initialState = {
         		minutes: '00',
         		seconds: '00',
      		},
-      		timerTime: '',
+      		timerTime: 0,
+      		timerStart: 0,
+      		timerOn: false,
+      		timerId: null,
       		timerTimeCountDown: 0,
       		currentMiniStopwatchTime: {
 				hours: '00',
@@ -77,8 +80,11 @@ const initialState = {
         		minutes: '00',
         		seconds: '00'
      		},
-      		timerTime: '',
-      		timerTimeCountDown: 0,
+      		timerTime: 0,
+      		timerStart: 0,
+      		timerOn: false,
+      		      	timerId: null,
+			timerTimeCountDown: 0,
       		currentMiniStopwatchTime: {
 				hours: '00',
 				minutes: '00',
@@ -208,18 +214,27 @@ const reducer = (state=initialState, action) => {
 			let currentMiniStopwatchTime = newBusiness9[index9].currentMiniStopwatchTime;
 			let currentCountdownTime = newBusiness9[index9].currentCountdownTime;;
 
-			if(newBusiness9[index9].stopWatchIsShown){
-				if(newBusiness9[index9].timerTime<60000){
-					alert('Work at least 1 minute!');
-					return state;
+			if(newBusiness9[index9].timerOn && newBusiness9[index9].timerTime>59000){
+				alert('Would you like to stop timer and add your hours?')
+			}
+			if(newBusiness9[index9].timerOn && newBusiness9[index9].timerTime<60000){
+				alert('Work at least 1 minute');
+			}
+
+			if(!newBusiness9[index9].timerOn){
+				if(newBusiness9[index9].stopWatchIsShown){
+					if(newBusiness9[index9].timerTime<60000){
+						alert('Work at least 1 minute!');
+						return state;
+					}
+					newBusiness9[index9].totalHours.hours = parseInt(currentTotalHours.hours, 10) + parseInt(currentStopWatchTime.hours, 10);
+					newBusiness9[index9].totalHours.minutes = parseInt(currentTotalHours.minutes, 10) + parseInt(currentStopWatchTime.minutes, 10);
+					if(newBusiness9[index9].totalHours.minutes>59){
+						let restMinutes = newBusiness9[index9].totalHours.minutes - 60;
+						newBusiness9[index9].totalHours.minutes=restMinutes;
+						newBusiness9[index9].totalHours.hours +=1;
+					}			
 				}
-				newBusiness9[index9].totalHours.hours = parseInt(currentTotalHours.hours, 10) + parseInt(currentStopWatchTime.hours, 10);
-				newBusiness9[index9].totalHours.minutes = parseInt(currentTotalHours.minutes, 10) + parseInt(currentStopWatchTime.minutes, 10);
-				if(newBusiness9[index9].totalHours.minutes>59){
-					let restMinutes = newBusiness9[index9].totalHours.minutes - 60;
-					newBusiness9[index9].totalHours.minutes=restMinutes;
-					newBusiness9[index9].totalHours.hours +=1;
-				}			
 			}
 
 			else if(newBusiness9[index9].countDownIsShown){
@@ -271,6 +286,67 @@ const reducer = (state=initialState, action) => {
 				business: newBusiness10
 			}
 			return newState10;
+
+		case actionTypes.UPDATE_STOPWATCH:
+      		let newBusiness11 = [...state.business];
+      		let index11 = newBusiness11.findIndex((el)=>el.id==action.id);
+  			let stopWatchData = action.stopWatchData;
+
+  			if(stopWatchData.timerOn!==undefined){
+      			newBusiness11[index11].timerOn = stopWatchData.timerOn;
+      		}
+      		if(stopWatchData.timerStart!==undefined){
+      			newBusiness11[index11].timerStart = stopWatchData.timerStart;
+      		}
+      		if(stopWatchData.timerTime!==undefined){
+      			newBusiness11[index11].timerTime = stopWatchData.timerTime;
+      		}
+
+  			let centiseconds = ("0" + (Math.floor(newBusiness11[index11].timerTime / 10)% 100)).slice(-2);
+  			let seconds = ("0" + (Math.floor(newBusiness11[index11].timerTime / 1000) % 60)).slice(-2);
+  			let minutes = ("0" + (Math.floor(newBusiness11[index11].timerTime / 60000) % 60)).slice(-2);
+  			let hours = ("0" + Math.floor(newBusiness11[index11].timerTime / 3600000)).slice(-2);
+			
+  			newBusiness11[index11].currentStopwatchTime.centiseconds = centiseconds;
+  			newBusiness11[index11].currentStopwatchTime.seconds = seconds;
+  			newBusiness11[index11].currentStopwatchTime.minutes = minutes;
+  			newBusiness11[index11].currentStopwatchTime.hours = hours;
+
+			let newState11 = {
+				business: newBusiness11
+			}
+			return newState11;
+
+			case actionTypes.SAVE_TIMER_ID:
+			let newBusiness12 = [...state.business];
+      		let index12 = newBusiness12.findIndex((el)=>el.id==action.id);
+
+      		newBusiness12[index12].timerId = action.timerId;
+
+			let newState12 = {
+				business: newBusiness12
+			}
+
+			return newState12;
+
+			case actionTypes.CLEAR_STOPWATCH:
+			let newBusiness13 = [...state.business];
+      		let index13 = newBusiness13.findIndex((el)=>el.id==action.id);
+
+
+      		newBusiness13[index13].timerStart = action.timerStart = 0;
+      		newBusiness13[index13].timerTime = action.timerTime = 0;
+
+      		newBusiness13[index13].currentStopwatchTime.centiseconds = '00';
+      		newBusiness13[index13].currentStopwatchTime.seconds = '00';
+      		newBusiness13[index13].currentStopwatchTime.minutes = '00';
+      		newBusiness13[index13].currentStopwatchTime.hours = '00';
+
+			let newState13 = {
+				business: newBusiness13
+			}
+
+			return newState13;
 
 		default:
 		return state; 

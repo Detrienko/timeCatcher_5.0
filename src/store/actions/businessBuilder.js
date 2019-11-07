@@ -86,3 +86,27 @@ export const increaseTimer = (increaseBy, id) => {
 	}
 }
 
+// STOPWATCH 
+
+export const updateStopwatch = (stopWatchData, id) => {
+	return{
+		type: actionTypes.UPDATE_STOPWATCH,
+		stopWatchData: stopWatchData, 
+		id: id
+	}
+}
+
+export const clearStopwatch = (id) => {
+	return{
+		type: actionTypes.CLEAR_STOPWATCH,
+		id: id
+	}
+}
+
+export const saveTimerId = (timerId, id) => {
+	return{
+		type: actionTypes.SAVE_TIMER_ID,
+		timerId: timerId, 
+		id: id
+	}
+}
